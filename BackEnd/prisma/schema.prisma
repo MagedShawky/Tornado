@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Boat {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  capacity      Int
+  cabin_count   Int
+  feature_photo String?
+  status        String
+  created_at    DateTime @default(now())
+  cabins        Cabin[]
+  trips         Trip[]
+}
+
+model Cabin {
+  id          String   @id @default(uuid())
+  boat_id     String
+  cabin_number String
+  cabin_type  String
+  bed_count   Int
+  bed_numbers String
+  deck        String
+  deck_name   String?
+  base_price  Float?
+  created_at  DateTime @default(now())
+  boat        Boat     @relation(fields: [boat_id], references: [id])
+  bookings    CabinBooking[]
+}
+
+model Trip {
+  id             String   @id @default(uuid())
+  boat_id        String
+  destination    String
+  location_from  String
+  location_to    String
+  start_date     DateTime
+  end_date       DateTime
+  price          Float
+  available_spots Int
+  booked_spots   Int      @default(0)
+  status         String
+  created_at     DateTime @default(now())
+  boat           Boat     @relation(fields: [boat_id], references: [id])
+  cabin_bookings CabinBooking[]
+  booking_client_details BookingClientDetails[]
+  booking_client_info    BookingClientInfo[]
+  booking_travel_info    BookingTravelInfo[]
+  booking_tourism_services BookingTourismServices[]
+  booking_rentals        BookingRentals[]
+}
+
+model CabinBooking {
+  id               String   @id @default(uuid())
+  trip_id          String
+  cabin_id         String
+  bed_number       Int
+  booked_at        DateTime?
+  price            Float
+  status           String?
+  passenger_gender String?
+  cancel_date      DateTime?
+  created_at       DateTime @default(now())
+  trip             Trip     @relation(fields: [trip_id], references: [id])
+  cabin            Cabin    @relation(fields: [cabin_id], references: [id])
+}
+
+model BookingClientDetails {
+  id          String   @id @default(uuid())
+  booking_id  String
+  trip_id     String
+  cabin_number String
+  bed_number  Int
+  name        String?
+  surname     String?
+  gender      String?
+  nationality String?
+  category    String?
+  group_name  String?
+  single_use  Boolean?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  trip        Trip     @relation(fields: [trip_id], references: [id])
+}
+
+model BookingClientInfo {
+  id                    String   @id @default(uuid())
+  booking_id            String
+  trip_id               String
+  name                  String?
+  surname               String?
+  email                 String?
+  phone                 String?
+  address               String?
+  city                  String?
+  country               String?
+  postal_code           String?
+  date_of_birth         DateTime?
+  emergency_contact_name String?
+  emergency_contact_phone String?
+  dietary_restrictions  String?
+  diving_level          String?
+  diving_license_type   String?
+  document_uploaded     Boolean?
+  food_remarks          String?
+  special_needs         String?
+  visa_number           String?
+  visa_issue_date       DateTime?
+  group_name            String?
+  cabin                 String?
+  bed_number            Int?
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  trip                  Trip     @relation(fields: [trip_id], references: [id])
+}
+
+model BookingTravelInfo {
+  id                          String   @id @default(uuid())
+  booking_id                  String
+  trip_id                     String
+  name                        String?
+  surname                     String?
+  arrival_airport             String?
+  arrival_flight_number       String?
+  arrival_date                DateTime?
+  arrival_time                String?
+  arrival_hotel               String?
+  arrival_notes               String?
+  departure_airport           String?
+  departure_flight_number     String?
+  departure_date              DateTime?
+  departure_time              String?
+  night_hotel                 String?
+  night_hotel_departure       String?
+  day_use_hotel               String?
+  day_use_hotel_departure     String?
+  transfer_needed             Boolean?
+  transfer_details            String?
+  transfer_airport_to_boat    String?
+  transfer_hotel_to_boat      String?
+  transfer_boat_to_airport    String?
+  transfer_boat_to_hotel      String?
+  transfer_boat_to_hotel_departure String?
+  transfer_hotel_to_airport   String?
+  bed_number                  Int?
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @updatedAt
+  trip                        Trip     @relation(fields: [trip_id], references: [id])
+}
+
+model BookingTourismServices {
+  id            String   @id @default(uuid())
+  booking_id    String
+  trip_id       String
+  service_name  String
+  service_type  String
+  service_date  DateTime?
+  price_per_unit Float
+  quantity      Int?
+  total_price   Float
+  notes         String?
+  status        String?
+  bed_number    Int?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  trip          Trip     @relation(fields: [trip_id], references: [id])
+}
+
+model BookingRentals {
+  id              String   @id @default(uuid())
+  booking_id      String
+  trip_id         String
+  equipment_type  String
+  brand           String?
+  size            String?
+  price_per_unit  Float
+  quantity        Int?
+  rent_period_days Int?
+  total_price     Float
+  notes           String?
+  status          String?
+  bed_number      Int?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  trip            Trip     @relation(fields: [trip_id], references: [id])
+}
+
+model Profile {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  role         String
+  first_name   String?
+  last_name    String?
+  phone_number String?
+  company      String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime?
+} 
